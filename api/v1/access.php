@@ -159,8 +159,29 @@ function get_object_by_keywords($kw = '', $count = 25, $offset = 0, $type = '')
 }
 
 # Get an image with an id and type
+$image_query_product = $pdo->prepare("SELECT picture FROM project_product WHERE productId = ?");
+$image_query_renter = $pdo->prepare("SELECT picture FROM RenterUnauth WHERE userId = ?");
+$image_query_rentee = $pdo->prepare("SELECT picture FROM RenteeUnauth WHERE userId = ?");
 function get_image_id_type($id, $type)
 {
-    # if ($type = )
+    global $image_query_product, $image_query_renter, $image_query_rentee;
+    # Products and services are in the same table
+    if ($type === "product" or $type === "service")
+    {
+        $image_query_product->execute(array($id));
+        return $image_query_product->fetchAll()[0]["picture"];
+    }
+
+    # Renters and rentees are in different tables
+    if ($type === "renter")
+    {
+        $image_query_renter->execute(array($id));
+        return $image_query_renter->fetchAll()[0]["picture"];
+    }
+    if ($type === "rentee")
+    {
+        $image_query_rentee->execute(array($id));
+        return $image_query_rentee->fetchAll()[0]["picture"];
+    }
 }
 ?>
